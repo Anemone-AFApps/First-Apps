@@ -52,12 +52,14 @@ def run_pytest(pytest_args: list[str], log_path: Path) -> int:
             log_file.write(line)
         return_code = process.wait()
 
+        outcome = "SUCCESS" if return_code == 0 else "FAILURE"
         footer = (
             "\n".join(
                 [
                     "",
                     "=" * 80,
                     f"Completed at {dt.datetime.now().isoformat()} with exit code {return_code}",
+                    f"Overall result: {outcome}",
                     "=" * 80,
                 ]
             )
