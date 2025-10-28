@@ -9,8 +9,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
 
-from backend.app.services.trending.service import TrendingService
-
 
 class HealableComponent(Protocol):
     """Interface for subsystems that support automated remediation."""

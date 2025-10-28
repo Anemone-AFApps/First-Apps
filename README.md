@@ -1,109 +1,53 @@
-# Autonomous Discovery Platform
+# Autonomous First App
 
-Fondasi layanan otonom yang siap dikembangkan menjadi aplikasi pencari tren
-terbaru. Repositori ini sudah menyiapkan API publik untuk mengumpulkan top item
-yang sedang viral dari berbagai sumber gratis tanpa perlu konfigurasi manual.
-
-## Fitur Utama
-
-- **Endpoint `/trending`** menggabungkan data populer dari Reddit, Hacker News,
-  dan GitHub (dapat diperluas). Jumlah item bawaan adalah 10 namun bisa diatur
-  melalui parameter query atau variabel lingkungan.
-- **Caching otomatis & pembaruan periodik** menjaga data tetap segar tanpa beban
-  permintaan berulang ke sumber eksternal.
-- **Monitoring self-healing** melalui modul automation yang siap memperbarui
-  cache jika sumber data mengalami gangguan.
-- **Struktur modular** memudahkan penambahan sumber data baru, penyimpanan,
-  maupun antarmuka pengguna.
+Fondasi untuk platform aplikasi otonom yang dapat dikembangkan menjadi layanan
+multi-fitur. Struktur repository ini dibuat modular sehingga mudah menambah
+komponen baru seperti API tambahan, integrasi pihak ketiga, maupun modul
+self-healing.
 
 ## Struktur Direktori
 
 ```
 .
-├── automation/                    # Rutin otomatisasi & self-healing
-│   └── self_healing/              # Monitor siap pakai untuk trending service
+├── automation/            # Rutin otomatisasi & self-healing
+│   └── self_healing/
 │       └── monitor.py
-├── backend/
+├── backend/               # Layanan inti berbasis FastAPI
 │   ├── app/
-│   │   ├── core/                  # Konfigurasi dan utilitas global
-│   │   ├── services/
-│   │   │   └── trending/          # Aggregator & sumber data viral
-│   │   ├── routers/               # Endpoint FastAPI
-│   │   └── main.py                # Entry point + lifecycle background jobs
-│   ├── requirements.txt
-│   └── tests/                     # Unit test untuk service trending
-├── docs/
-│   └── ARCHITECTURE.md            # Dokumentasi arsitektur & roadmap
-├── infra/
+│   │   ├── main.py
+│   │   └── routers/
+│   │       └── status.py
+│   └── requirements.txt
+├── docs/                  # Dokumentasi arsitektur & panduan
+│   └── ARCHITECTURE.md
+├── infra/                 # Konfigurasi deployment (Docker, dsb.)
 │   ├── docker-compose.yaml
 │   └── dockerfiles/
 │       └── api.Dockerfile
-├── logs/                        # Hasil log eksekusi otomatis (dibuat saat tes)
-├── scripts/
+├── scripts/               # Skrip utilitas untuk pengembangan
 │   ├── dev-down.sh
-│   ├── dev-up.sh
-│   └── run_tests_with_log.py    # Menjalankan pytest + menyimpan log lengkap
+│   └── dev-up.sh
 └── README.md
 ```
 
-## Menjalankan Secara Lokal
+## Cara Menjalankan (Lokal)
 
-1. Pasang dependensi Python backend:
-   ```bash
-   cd backend
-   python -m venv .venv && source .venv/bin/activate
-   pip install -r requirements.txt
-   ```
-2. Jalankan API:
-   ```bash
-   uvicorn app.main:app --reload
-   ```
-3. Buka dokumentasi interaktif di `http://localhost:8000/docs` untuk mencoba
-   endpoint `/trending` dan `/status/health`.
+1. Pastikan Docker dan Docker Compose tersedia.
+2. Jalankan `scripts/dev-up.sh` untuk menyalakan layanan API.
+3. Akses dokumentasi interaktif di `http://localhost:8000/docs`.
+4. Gunakan `scripts/dev-down.sh` untuk mematikan layanan.
 
-> Alternatif: gunakan `scripts/dev-up.sh` untuk menjalankan via Docker
-> Compose, dan `scripts/dev-down.sh` untuk mematikannya.
+## Arah Pengembangan
 
-## Pengujian Otomatis & Log
+- **Integrasi API eksternal**: Tambahkan client SDK atau modul integrasi di
+  `backend/app/routers/` atau `automation/` sesuai kebutuhan.
+- **Penyimpanan data**: Deklarasikan service database di `infra/` dan buat layer
+  repository di backend.
+- **Antarmuka pengguna**: Tambahkan folder `frontend/` atau `apps/` untuk
+  aplikasi web/mobile, lalu hubungkan ke API.
+- **Self-healing lanjutan**: Implementasikan monitor tambahan di
+  `automation/self_healing/` untuk melakukan remediasi otomatis berdasarkan
+  metrik.
 
-Gunakan skrip utilitas berikut untuk mengeksekusi seluruh unit test sekaligus
-menyimpan log detailnya:
-
-```bash
-python scripts/run_tests_with_log.py backend/tests
-```
-
-Perintah di atas akan:
-
-- Menjalankan `pytest` dengan argumen yang diberikan (misalnya
-  `backend/tests`).
-- Menyimpan output lengkap ke folder `logs/` dengan nama berformat
-  `pytest-YYYYMMDD-HHMMSS.log`.
-- Menampilkan lokasi log pada akhir eksekusi sehingga mudah dilampirkan atau
-  dikirim sebagai artefak otomatisasi.
-
-## Konfigurasi
-
-Semua konfigurasi bisa dilakukan melalui variabel lingkungan (prefiks `APP_`):
-
-| Variabel | Default | Deskripsi |
-| --- | --- | --- |
-| `APP_TRENDING_DEFAULT_LIMIT` | `10` | Jumlah item trending ketika parameter `limit` tidak diberikan. |
-| `APP_TRENDING_REFRESH_SECONDS` | `900` | Interval refresh cache (detik). |
-| `APP_TRENDING_SOURCES` | `reddit,hackernews,github` | Daftar sumber aktif, dapat ditambah misal `reddit,youtube`. |
-| `APP_HTTP_TIMEOUT_SECONDS` | `10` | Timeout request HTTP ke sumber eksternal. |
-
-Konfigurasi juga bisa dimasukkan ke file `.env` di folder `backend/`.
-
-## Rencana Pengembangan
-
-- Tambahkan penyimpanan historis (mis. PostgreSQL) untuk analitik tren.
-- Integrasikan sumber data lain seperti TikTok, YouTube, atau marketplace lokal
-  menggunakan pola adapter yang sama.
-- Kembangkan antarmuka visual di folder `frontend/` untuk menampilkan dashboard
-  real-time.
-- Implementasikan workflow self-healing lanjutan dengan scheduler dan notifikasi
-  ketika sumber data gagal.
-
-Semua dependensi menggunakan software open-source/gratis sehingga tidak ada
-biaya lisensi tambahan.
+Semua komponen menggunakan tool dan library open-source sehingga tidak ada biaya
+lisensi.
