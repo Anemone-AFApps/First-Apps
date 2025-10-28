@@ -17,6 +17,10 @@ app.include_router(status.router)
 async def root() -> dict[str, str]:
     """Root endpoint that advertises service capabilities."""
     return {
+        "message": f"{settings.app_name} is online",
+        "docs": "/docs",
+        "status": "/status/health",
+        "trending": "/trending",
         "message": "Autonomous platform is online",
         "docs": "/docs",
         "status": "/status/health",

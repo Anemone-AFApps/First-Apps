@@ -8,6 +8,7 @@ __pycache__/
 .DS_Store
 .pytest_cache/
 .cache/
+.venv/
 node_modules/
 .dist/
 .coverage
