@@ -7,13 +7,12 @@ minimal friction.
 ## High-Level Components
 
 - **Backend API (`backend/`)** — Exposes core automation capabilities over HTTP
-  using FastAPI. The API now includes the `TrendingService` which aggregates
-  viral content from multiple free providers, keeps a rolling cache, and exposes
-  `/trending` plus `/trending/sources` endpoints.
+  using FastAPI. Designed as the central integration point for web clients,
+  schedulers, and third-party services. The API should remain stateless so that
+  it can be replicated horizontally.
 - **Automation Routines (`automation/`)** — Hosts long-running jobs and
-  background monitors that enable self-healing behaviour. The
-  `TrendingServiceMonitor` can trigger cache refreshes when a provider becomes
-  unhealthy.
+  background monitors that enable self-healing behaviour. Each automation module
+  can be scheduled independently.
 - **Interface Layer (`frontend/` or other clients)** — Web, mobile, or CLI
   clients that consume the API. The repository provides hooks for plugging in a
   web frontend or any other interface.
@@ -26,11 +25,9 @@ minimal friction.
 ## Suggested Workflow
 
 1. Extend the FastAPI routers with new feature endpoints under
-   `backend/app/routers/`. New adapters can register with the `TrendingService`
-   by implementing the `TrendingSource` interface.
+   `backend/app/routers/`.
 2. Add automation routines that call internal services or external APIs under
-   `automation/`. Pair them with monitors like `TrendingServiceMonitor` for
-   autonomous recovery.
+   `automation/`.
 3. Wire background jobs to the API using a scheduler (e.g. Celery, APScheduler)
    once requirements are known.
 4. Describe new capabilities in `docs/` and keep the top-level `README.md`
@@ -43,4 +40,3 @@ minimal friction.
 - Implement authentication in the API to support multi-tenant access.
 - Add monitoring/observability tooling (OpenTelemetry, Prometheus) for deep
   insights into self-healing performance.
-- Persist snapshots of trending data for analytics and recommendation engines.
