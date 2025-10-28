@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -24,6 +25,12 @@ def ensure_log_path() -> Path:
     logs_dir.mkdir(parents=True, exist_ok=True)
     timestamp = dt.datetime.now().strftime("%Y%m%d-%H%M%S")
     return logs_dir / f"pytest-{timestamp}.log"
+
+
+def update_latest_log(latest_log: Path, source_log: Path) -> None:
+    """Copy the generated log to a deterministic location for version control."""
+    latest_log.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(source_log, latest_log)
 
 
 def run_pytest(pytest_args: list[str], log_path: Path) -> int:
@@ -52,12 +59,14 @@ def run_pytest(pytest_args: list[str], log_path: Path) -> int:
             log_file.write(line)
         return_code = process.wait()
 
+        outcome = "SUCCESS" if return_code == 0 else "FAILURE"
         footer = (
             "\n".join(
                 [
                     "",
                     "=" * 80,
                     f"Completed at {dt.datetime.now().isoformat()} with exit code {return_code}",
+                    f"Overall result: {outcome}",
                     "=" * 80,
                 ]
             )
@@ -72,6 +81,9 @@ def main() -> int:
     args = parse_args()
     log_path = ensure_log_path()
     exit_code = run_pytest(args.pytest_args, log_path)
+    latest_log_path = log_path.with_name("pytest-latest.log")
+    update_latest_log(latest_log_path, log_path)
+    print(f"Latest log mirrored to {latest_log_path}")
     print(f"Detailed log written to {log_path}")
     return exit_code
 

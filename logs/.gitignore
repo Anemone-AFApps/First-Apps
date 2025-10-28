@@ -1,2 +1,3 @@
 *.log
 !pytest-20251028-083344.log
+!pytest-latest.log
