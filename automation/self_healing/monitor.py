@@ -39,3 +39,24 @@ async def run_health_cycle(component: HealableComponent) -> MonitorResult:
         status = "healing"
 
     return MonitorResult(component=component.name, status=status, details=diagnostics)
+
+
+@dataclass(slots=True)
+class TrendingServiceMonitor:
+    """Basic implementation that keeps the trending aggregation responsive."""
+
+    service: TrendingService
+    name: str = "trending_service"
+
+    async def diagnose(self) -> dict[str, str]:
+        snapshot = self.service.snapshot()
+        failing = [s for s in snapshot["sources"] if s.get("status") == "error"]
+        status = "healthy" if not failing else "degraded"
+        reason = ", ".join(s.get("source", "unknown") for s in failing) if failing else ""
+        return {
+            "status": status,
+            "reason": reason or "operational",
+        }
+
+    async def heal(self, *, reason: str) -> None:
+        await self.service.fetch_trending(force_refresh=True)
