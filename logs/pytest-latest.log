@@ -1,0 +1,21 @@
+================================================================================
+Pytest invocation at 2025-10-28T09:04:16.878407
+Command: /root/.pyenv/versions/3.11.12/bin/python -m pytest backend/tests -vv
+================================================================================
+===================================================== test session starts ======================================================
+platform linux -- Python 3.11.12, pytest-8.1.1, pluggy-1.6.0 -- /root/.pyenv/versions/3.11.12/bin/python
+cachedir: .pytest_cache
+rootdir: /workspace/First-Apps
+plugins: asyncio-0.23.5, anyio-4.11.0
+asyncio: mode=Mode.STRICT
+collecting ... collected 2 items
+
+backend/tests/test_trending_service.py::test_trending_service_respects_limit_and_order PASSED                            [ 50%]
+backend/tests/test_trending_service.py::test_trending_service_cache_reuse PASSED                                         [100%]
+
+====================================================== 2 passed in 0.21s =======================================================
+
+================================================================================
+Completed at 2025-10-28T09:04:17.602608 with exit code 0
+Overall result: SUCCESS
+================================================================================
