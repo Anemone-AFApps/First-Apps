@@ -1,0 +1,14 @@
+version: "3.9"
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: infra/dockerfiles/api.Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../backend:/app/backend:ro
+      - ../automation:/app/automation:ro
+    environment:
+      - ENVIRONMENT=development
+    command: uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
